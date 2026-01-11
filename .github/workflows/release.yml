@@ -46,7 +46,11 @@ jobs:
 
       - name: Install Vulkan SDK (Windows)
         if: matrix.platform == 'windows-latest'
-        run: choco install vulkan-sdk -y
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/vulkansdk-windows-X64-1.4.335.0.exe" -OutFile "VulkanSDK-Installer.exe"
+          Start-Process -FilePath ".\VulkanSDK-Installer.exe" -ArgumentList "/S" -Wait
+          echo "VULKAN_SDK=C:\VulkanSDK\1.4.335.0" >> $env:GITHUB_ENV
 
 
 
