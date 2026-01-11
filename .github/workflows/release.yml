@@ -46,7 +46,9 @@ jobs:
 
       - name: Install Vulkan SDK (Windows)
         if: matrix.platform == 'windows-latest'
-        run: choco install vulkan-sdk
+        run: choco install vulkan-sdk -y
+
+
 
 
 
