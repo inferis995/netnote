@@ -1,12 +1,15 @@
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/PLACEHOLDER_ICON" alt="NetNote Logo" width="120" height="120" />
+  <img src="./app-icon.png" alt="NetNote Logo" width="120" height="120" />
   
   # NetNote
   
   **Il Tuo Pensiero. Privato & Locale.**
+
+  ### [🌐 Visita il Sito Ufficiale: netnote.netlify.app](https://netnote.netlify.app/)
   
-  [![Release](https://img.shields.io/github/v/release/inferis995/netnote?style=for-the-badge&color=fe5c00)](https://github.com/inferis995/netnote/releases)
+  [![Website](https://img.shields.io/badge/website-netnote.netlify.app-orange?style=for-the-badge)](https://netnote.netlify.app/)
+[![Release](https://img.shields.io/github/v/release/inferis995/netnote?style=for-the-badge&color=fe5c00)](https://github.com/inferis995/netnote/releases)
   [![Platform](https://img.shields.io/badge/platform-Windows-blue?style=for-the-badge)](https://github.com/inferis995/netnote)
   [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
 
