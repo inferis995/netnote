@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    overflow: hidden;
+    @apply antialiased;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+
+  input,
+  textarea {
+    font-family: inherit;
+    border: none;
+    background: none;
+    outline: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-200 dark:bg-neutral-800;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-300 dark:bg-neutral-700;
+  }
+}
+
+:root {
+  --sidebar-width: 260px;
+
+  /* Light Theme - Clean Studio */
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f4f4f5;
+  /* Zinc 100 */
+  --color-bg-elevated: #ffffff;
+
+  --color-sidebar: #f8f8fa;
+  --color-sidebar-hover: #ebebef;
+  --color-sidebar-selected: #e4e4e7;
+
+  --color-border: #e4e4e7;
+  --color-border-subtle: #f4f4f5;
+
+  --color-text: #09090b;
+  /* Zinc 950 */
+  --color-text-secondary: #71717a;
+  /* Zinc 500 */
+  --color-text-tertiary: #a1a1aa;
+  /* Zinc 400 */
+  --color-text-placeholder: #d4d4d8;
+  /* Zinc 300 */
+  --color-text-ai: #fe5c00;
+  /* Orange Accent for AI */
+
+  /* Accent - Orange/Rust */
+  --color-accent: #fe5c00;
+  --color-accent-hover: #ea580c;
+  --color-accent-text: #ffffff;
+  --color-accent-light: rgba(254, 92, 0, 0.1);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root.dark {
+  /* Dark Theme - Pitch Black Studio */
+  --color-bg: #000000;
+  /* True Black */
+  --color-bg-subtle: #09090b;
+  /* Zinc 950 */
+  --color-bg-elevated: #121212;
+  /* Nearly Black */
+
+  --color-sidebar: #000000;
+  --color-sidebar-hover: #18181b;
+  /* Zinc 900 */
+  --color-sidebar-selected: #27272a;
+  /* Zinc 800 */
+
+  --color-border: #27272a;
+  /* Zinc 800 */
+  --color-border-subtle: #18181b;
+
+  --color-text: #ffffff;
+  --color-text-secondary: #a1a1aa;
+  /* Zinc 400 */
+  --color-text-tertiary: #52525b;
+  /* Zinc 600 */
+  --color-text-placeholder: #3f3f46;
+  --color-text-ai: #fe5c00;
+
+  --color-accent: #fe5c00;
+  /* Orange Accent */
+  --color-accent-hover: #ea580c;
+  --color-accent-text: #ffffff;
+  --color-accent-light: rgba(254, 92, 0, 0.15);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.8);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.8);
+  --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 1);
+}
