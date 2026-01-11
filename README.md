@@ -9,7 +9,7 @@
   ### [🌐 Visita il Sito Ufficiale: netnote.netlify.app](https://netnote.netlify.app/)
   
   [![Website](https://img.shields.io/badge/website-netnote.netlify.app-orange?style=for-the-badge)](https://netnote.netlify.app/)
-[![Release](https://img.shields.io/github/v/release/inferis995/netnote?style=for-the-badge&color=fe5c00)](https://github.com/inferis995/netnote/releases)
+  [![Release](https://img.shields.io/github/v/release/inferis995/netnote?style=for-the-badge&color=fe5c00)](https://github.com/inferis995/netnote/releases/latest)
   [![Platform](https://img.shields.io/badge/platform-Windows-blue?style=for-the-badge)](https://github.com/inferis995/netnote)
   [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
 
@@ -46,7 +46,7 @@ A differenza di Notion o Evernote, NetNote **non invia mai** i tuoi dati al clou
 2.  **Ollama** installato e in esecuzione (per le funzionalità IA).
 
 ### Setup Rapido
-1.  Scarica l'ultima release dalla [pagina Releases](https://github.com/inferis995/netnote/releases).
+1.  Scarica l'ultima release dalla [pagina Releases](https://github.com/inferis995/netnote/releases/latest).
 2.  Installa il file `.exe`.
 3.  Assicurati di avere Ollama avviato (`ollama run llama3` nel terminale).
 4.  Avvia NetNote e inizia a creare.
