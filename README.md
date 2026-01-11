@@ -5,6 +5,11 @@
   # NetNote
   
   **Il Tuo Pensiero. Privato & Locale.**
+
+[🌐 **Visita la Landing Page** 🚀](https://netnote.netlify.app/)
+
+---
+</p>
   
   [![Release](https://img.shields.io/github/v/release/inferis995/netnote?style=for-the-badge&color=fe5c00)](https://github.com/inferis995/netnote/releases)
   [![Platform](https://img.shields.io/badge/platform-Windows-blue?style=for-the-badge)](https://github.com/inferis995/netnote)
