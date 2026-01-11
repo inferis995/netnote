@@ -21,16 +21,24 @@ export function UpdatesTab() {
     setLastChecked(new Date().toLocaleTimeString());
   };
 
-  const recentChanges = [
-    {
-      version: "Beta 1.0",
+  {
+    version: "1.0.1",
       date: "Gennaio 2026",
-      changes: [
-        "Prima release ufficiale",
-        "Trascrizione locale con Whisper",
-        "Profilo e Avatar personalizzabili",
-        "Nuova esperienza utente Premium"
-      ],
+        changes: [
+          "Accelerazione Hardware (Vulkan/Metal)",
+          "Miglioramenti prestazioni trascrizione",
+          "Fix driver GPU su Windows/Mac"
+        ],
+    },
+  {
+    version: "1.0.0",
+      date: "Gennaio 2026",
+        changes: [
+          "Prima release ufficiale",
+          "Trascrizione locale con Whisper",
+          "Profilo e Avatar personalizzabili",
+          "Nuova esperienza utente Premium"
+        ],
     }
   ];
 
