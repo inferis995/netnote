@@ -44,13 +44,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Vulkan SDK (Windows)
+      - name: Setup Vulkan SDK
         if: matrix.platform == 'windows-latest'
-        shell: powershell
-        run: |
-          Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.4.335.0/windows/vulkansdk-windows-X64-1.4.335.0.exe" -OutFile "VulkanSDK-Installer.exe"
-          Start-Process -FilePath ".\VulkanSDK-Installer.exe" -ArgumentList "/S" -Wait
-          echo "VULKAN_SDK=C:\VulkanSDK\1.4.335.0" >> $env:GITHUB_ENV
+        uses: humantree/setup-vulkan-sdk@v1
+        with:
+          vulkan-query-version: 1.3.268.0
+          vulkan-components: Vulkan-Headers, Vulkan-Loader
+          vulkan-use-cache: true
 
 
 
