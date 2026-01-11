@@ -271,8 +271,9 @@ pub async fn start_live_transcription(
                 }
             };
 
-            // Run both transcriptions in parallel
-            let (mic_result, system_result) = tokio::join!(mic_future, system_future);
+            // Run transcriptions SEQUENTIALLY to avoid simultaneous GPU access (Vulkan Crash Fix)
+            let mic_result = mic_future.await;
+            let system_result = system_future.await;
 
             // Collect all segments for batch DB insert
             let mut db_segments: Vec<(String, f64, f64, String, Option<String>)> = Vec::new();

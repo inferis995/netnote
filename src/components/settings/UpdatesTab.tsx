@@ -21,24 +21,34 @@ export function UpdatesTab() {
     setLastChecked(new Date().toLocaleTimeString());
   };
 
-  {
-    version: "1.0.1",
+  const recentChanges = [
+    {
+      version: "1.0.2",
       date: "Gennaio 2026",
-        changes: [
-          "Accelerazione Hardware (Vulkan/Metal)",
-          "Miglioramenti prestazioni trascrizione",
-          "Fix driver GPU su Windows/Mac"
-        ],
+      changes: [
+        "Critical Hotfix: Crash Vulkan risolto",
+        "Migliore stabilità audio simultaneo",
+        "Signatures aggiornate"
+      ],
     },
-  {
-    version: "1.0.0",
+    {
+      version: "1.0.1",
       date: "Gennaio 2026",
-        changes: [
-          "Prima release ufficiale",
-          "Trascrizione locale con Whisper",
-          "Profilo e Avatar personalizzabili",
-          "Nuova esperienza utente Premium"
-        ],
+      changes: [
+        "Accelerazione Hardware (Vulkan/Metal)",
+        "Miglioramenti prestazioni trascrizione",
+        "Fix driver GPU su Windows/Mac"
+      ],
+    },
+    {
+      version: "1.0.0",
+      date: "Gennaio 2026",
+      changes: [
+        "Prima release ufficiale",
+        "Trascrizione locale con Whisper",
+        "Profilo e Avatar personalizzabili",
+        "Nuova esperienza utente Premium"
+      ],
     }
   ];
 

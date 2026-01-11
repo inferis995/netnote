@@ -1,14 +1,14 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "NetNote",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "identifier": "com.netnote.app",
   "plugins": {
     "updater": {
       "endpoints": [
         "https://github.com/inferis995/netnote/releases/latest/download/latest.json"
       ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEI1MzNGQjI0NzlBOTA1NjAKUldSZ0JhbDVKUHN6dFh3aHpzY014dGNJdWdZN0g4c1Y0K0NLZ2wxdnN5WXNmS21qYXluV1JieHQK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ4MjE5Mjg3MTZEMzY4QjcKUldTM2FOTVdoNUloU0ZFSEpIb2xhdnc3YlVPd1dqNzdBeDhIdTdGaG05eTlWNytnWmRxTmFIVU4K"
     }
   },
   "build": {

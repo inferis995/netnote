@@ -6,9 +6,12 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Manager};
+#[cfg(target_os = "macos")]
+use tauri::Emitter;
 
 /// Patterns to detect active meetings (not just app/page open)
+#[allow(dead_code)]
 const MEETING_PATTERNS: &[(&str, &str)] = &[
     // Google Meet - only when actually in a meeting (has meeting code)
     // Format when in meeting: "Meet - abc-defg-hij"
@@ -30,15 +33,18 @@ const MEETING_PATTERNS: &[(&str, &str)] = &[
 ];
 
 /// Patterns that indicate active audio/call (speaker icon in title)
+#[allow(dead_code)]
 const AUDIO_ACTIVE_INDICATOR: &str = "🔊";
 
 /// App names to check for audio indicator
+#[allow(dead_code)]
 const AUDIO_APPS: &[(&str, &str)] = &[
     ("Microsoft Teams", "Microsoft Teams"),
     ("Slack", "Slack"),
 ];
 
 /// Patterns that indicate app is open but NOT in a meeting (to filter out false positives)
+#[allow(dead_code)]
 const NOT_IN_MEETING_PATTERNS: &[&str] = &[
     "New meeting",
     "Join a meeting",
@@ -51,6 +57,7 @@ const NOT_IN_MEETING_PATTERNS: &[&str] = &[
 ];
 
 #[derive(Debug, Clone, Serialize)]
+#[allow(dead_code)]
 pub struct MeetingDetected {
     pub app_name: String,
     pub bundle_id: Option<String>,

@@ -16,10 +16,12 @@ use std::sync::Arc;
 static STARTED_MINIMIZED: AtomicBool = AtomicBool::new(false);
 use tauri::{
     image::Image,
-    menu::{Menu, MenuBuilder, MenuItem, SubmenuBuilder},
+    menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
     Emitter, Listener, Manager, RunEvent, WindowEvent,
 };
+#[cfg(target_os = "macos")]
+use tauri::menu::{MenuBuilder, SubmenuBuilder};
 use tauri_plugin_autostart::MacosLauncher;
 
 #[derive(Debug, Deserialize)]
