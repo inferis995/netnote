@@ -137,7 +137,11 @@ impl Default for RecordingState {
 
 /// Start recording audio to the specified path
 /// Returns immediately, recording happens in a background thread
-pub fn start_recording(state: Arc<RecordingState>, output_path: PathBuf) -> Result<(), AudioError> {
+pub fn start_recording(
+    state: Arc<RecordingState>,
+    output_path: PathBuf,
+    device_id: Option<String>,
+) -> Result<(), AudioError> {
     let current_phase = state.get_phase();
     if current_phase == RecordingPhase::Recording {
         return Err(AudioError::AlreadyRecording);
@@ -162,7 +166,7 @@ pub fn start_recording(state: Arc<RecordingState>, output_path: PathBuf) -> Resu
 
     // Spawn recording thread
     thread::spawn(move || {
-        if let Err(e) = run_recording(state_clone, output_path) {
+        if let Err(e) = run_recording(state_clone, output_path, device_id) {
             eprintln!("Recording error: {}", e);
         }
     });
@@ -200,7 +204,9 @@ pub fn resume_recording(state: Arc<RecordingState>, output_path: PathBuf) -> Res
     state.current_segment_index.store(new_index, Ordering::SeqCst);
 
     // Start recording with the new path
-    start_recording(state, output_path)
+    // Start recording with the new path - NOTE: resumed recording currently uses default device
+    // Todo: persist device ID in state to reuse it here
+    start_recording(state, output_path, None)
 }
 
 /// Stop recording completely - resets all state
@@ -230,11 +236,31 @@ pub fn stop_recording_preserving_state(state: &RecordingState) -> Result<(Option
     Ok((path.clone(), duration_ms))
 }
 
-fn run_recording(state: Arc<RecordingState>, output_path: PathBuf) -> Result<(), AudioError> {
+fn run_recording(
+    state: Arc<RecordingState>,
+    output_path: PathBuf,
+    device_id: Option<String>,
+) -> Result<(), AudioError> {
     let host = cpal::default_host();
-    let device = host
-        .default_input_device()
-        .ok_or(AudioError::NoInputDevice)?;
+    
+    let device = if let Some(id) = device_id {
+        // Try to find device by name (using id as name for now)
+        let mut found_device = None;
+        if let Ok(devices) = host.input_devices() {
+            for d in devices {
+                if let Ok(name) = d.name() {
+                    if name == id {
+                        found_device = Some(d);
+                        break;
+                    }
+                }
+            }
+        }
+        // Fallback to default if not found
+        found_device.or_else(|| host.default_input_device()).ok_or(AudioError::NoInputDevice)?
+    } else {
+        host.default_input_device().ok_or(AudioError::NoInputDevice)?
+    };
 
     let config = device.default_input_config()?;
     let sample_rate = config.sample_rate().0;

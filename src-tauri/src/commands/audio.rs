@@ -44,11 +44,55 @@ impl Default for AudioState {
     }
 }
 
+// Struct for sending device info to frontend
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AudioDeviceInfo {
+    pub id: String,
+    pub name: String,
+    pub is_default: bool,
+}
+
+#[tauri::command]
+pub fn get_audio_input_devices() -> Result<Vec<AudioDeviceInfo>, String> {
+    use cpal::traits::{DeviceTrait, HostTrait};
+
+    let host = cpal::default_host();
+    let default_device = host.default_input_device();
+    let default_name = default_device.as_ref().and_then(|d| d.name().ok());
+
+    let devices = host.input_devices().map_err(|e| e.to_string())?;
+    let mut result = Vec::new();
+
+    for device in devices {
+        if let Ok(name) = device.name() {
+            // Filter out output devices if any slipped through (though input_devices() should be inputs only)
+            // Windows loopback devices might appear, we keep them for now as user might want them
+            
+            // Generate a stable-ish ID. On Windows name is unique enough usually.
+            // cpal doesn't expose stable IDs easily across platforms without extra work.
+            // For now, we use the name as the ID, or a combination if needed.
+            let id = name.clone(); 
+            
+            let is_default = Some(&name) == default_name.as_ref();
+
+            result.push(AudioDeviceInfo {
+                id,
+                name,
+                is_default,
+            });
+        }
+    }
+
+    Ok(result)
+}
+
 #[tauri::command]
 pub fn start_recording(
     app: AppHandle,
     state: State<AudioState>,
     note_id: String,
+    device_id: Option<String>,
 ) -> Result<String, String> {
     // Get app data directory for storing recordings
     let app_data_dir = app
@@ -62,7 +106,7 @@ pub fn start_recording(
     let filename = format!("{}.wav", note_id);
     let output_path = recordings_dir.join(&filename);
 
-    audio::start_recording(state.recording.clone(), output_path.clone())
+    audio::start_recording(state.recording.clone(), output_path.clone(), device_id)
         .map_err(|e| e.to_string())?;
 
     Ok(output_path.to_string_lossy().to_string())
@@ -224,6 +268,7 @@ pub fn start_dual_recording(
     app: AppHandle,
     state: State<AudioState>,
     note_id: String,
+    mic_device_id: Option<String>,
 ) -> Result<DualRecordingResult, String> {
     // Get app data directory for storing recordings
     let app_data_dir = app
@@ -243,7 +288,7 @@ pub fn start_dual_recording(
     let system_path = recordings_dir.join(&system_filename);
 
     // Start mic recording
-    audio::start_recording(state.recording.clone(), mic_path.clone())
+    audio::start_recording(state.recording.clone(), mic_path.clone(), mic_device_id)
         .map_err(|e| e.to_string())?;
 
     // Try to start system audio recording if available
@@ -548,6 +593,7 @@ pub fn continue_note_recording(
     state: State<AudioState>,
     db: State<Database>,
     note_id: String,
+    mic_device_id: Option<String>,
 ) -> Result<DualRecordingResult, String> {
     // First, reopen the note (clear ended_at)
     {
@@ -639,7 +685,7 @@ pub fn continue_note_recording(
         .store(segment_id, Ordering::SeqCst);
 
     // Start mic recording
-    audio::start_recording(state.recording.clone(), mic_path.clone())
+    audio::start_recording(state.recording.clone(), mic_path.clone(), mic_device_id)
         .map_err(|e| e.to_string())?;
 
     // Try to start system audio recording
@@ -682,6 +728,7 @@ pub fn start_dual_recording_with_segments(
     state: State<AudioState>,
     db: State<Database>,
     note_id: String,
+    mic_device_id: Option<String>,
 ) -> Result<DualRecordingResult, String> {
     let app_data_dir = app
         .path()
@@ -735,7 +782,7 @@ pub fn start_dual_recording_with_segments(
         .store(segment_id, Ordering::SeqCst);
 
     // Start mic recording
-    audio::start_recording(state.recording.clone(), mic_path.clone())
+    audio::start_recording(state.recording.clone(), mic_path.clone(), mic_device_id)
         .map_err(|e| e.to_string())?;
 
     // Try to start system audio recording

@@ -242,7 +242,7 @@ export function AudioPlayer({ audioPath }: AudioPlayerProps) {
           {/* Skip back 10s */}
           <button
             onClick={() => skip(-10)}
-            className="p-1.5 rounded-full hover:bg-black/5 transition-colors"
+            className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
             style={{ color: "var(--color-text-secondary)" }}
             title="Back 10 seconds"
           >
@@ -259,7 +259,7 @@ export function AudioPlayer({ audioPath }: AudioPlayerProps) {
           {/* Skip forward 10s */}
           <button
             onClick={() => skip(10)}
-            className="p-1.5 rounded-full hover:bg-black/5 transition-colors"
+            className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
             style={{ color: "var(--color-text-secondary)" }}
             title="Forward 10 seconds"
           >
@@ -276,7 +276,7 @@ export function AudioPlayer({ audioPath }: AudioPlayerProps) {
           {/* Playback speed */}
           <button
             onClick={cyclePlaybackRate}
-            className="px-2 py-1 rounded-md hover:bg-black/5 transition-colors text-xs font-medium min-w-[3rem]"
+            className="px-2 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs font-medium min-w-[3rem]"
             style={{ color: "var(--color-text-secondary)" }}
             title="Playback speed"
           >

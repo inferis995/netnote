@@ -55,17 +55,17 @@ impl Transcriber {
     }
 
     /// Transcribe an audio file
-    pub fn transcribe(&self, audio_path: &Path) -> Result<TranscriptionResult, TranscriptionError> {
+    pub fn transcribe(&self, audio_path: &Path, language: Option<String>) -> Result<TranscriptionResult, TranscriptionError> {
         if self.is_transcribing.swap(true, Ordering::SeqCst) {
             return Err(TranscriptionError::AlreadyTranscribing);
         }
 
-        let result = self.transcribe_internal(audio_path);
+        let result = self.transcribe_internal(audio_path, language);
         self.is_transcribing.store(false, Ordering::SeqCst);
         result
     }
 
-    fn transcribe_internal(&self, audio_path: &Path) -> Result<TranscriptionResult, TranscriptionError> {
+    fn transcribe_internal(&self, audio_path: &Path, language: Option<String>) -> Result<TranscriptionResult, TranscriptionError> {
         if !audio_path.exists() {
             return Err(TranscriptionError::AudioNotFound(
                 audio_path.to_string_lossy().to_string(),
@@ -85,7 +85,8 @@ impl Transcriber {
         let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 1 });
 
         // Configure for better meeting transcription
-        params.set_language(Some("en")); // Default to English, can be made configurable
+        let lang = language.as_deref().unwrap_or("it");
+        params.set_language(Some(lang));
         params.set_translate(false);
         params.set_print_special(false);
         params.set_print_progress(false);
@@ -93,6 +94,10 @@ impl Transcriber {
         params.set_print_timestamps(false);
         params.set_token_timestamps(true);
         params.set_n_threads(num_cpus());
+        
+        // Anti-Hallucination settings (prevents "Grazie grazie" loop)
+        params.set_no_speech_thold(0.6); 
+        params.set_logprob_thold(-1.0);
 
         // Run the transcription
         state

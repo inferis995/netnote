@@ -228,6 +228,7 @@ pub fn get_loaded_model(state: State<TranscriptionState>) -> Option<String> {
 pub async fn transcribe_audio(
     audio_path: String,
     note_id: String,
+    language: Option<String>,
     speaker: Option<String>,
     state: State<'_, TranscriptionState>,
     db: State<'_, Database>,
@@ -251,7 +252,8 @@ pub async fn transcribe_audio(
 
     // Run transcription in a blocking task (since whisper-rs is synchronous)
     let path = PathBuf::from(&audio_path);
-    let result = tokio::task::spawn_blocking(move || transcriber.transcribe(&path))
+    let lang = language.clone();
+    let result = tokio::task::spawn_blocking(move || transcriber.transcribe(&path, lang))
         .await
         .map_err(|e| {
             state.is_transcribing.store(false, Ordering::SeqCst);
@@ -302,6 +304,7 @@ pub async fn transcribe_dual_audio(
     mic_path: String,
     system_path: Option<String>,
     note_id: String,
+    language: Option<String>,
     state: State<'_, TranscriptionState>,
     db: State<'_, Database>,
 ) -> Result<DualTranscriptionResult, String> {
@@ -327,7 +330,8 @@ pub async fn transcribe_dual_audio(
     // Transcribe mic audio (labeled as "You")
     let mic_path_buf = PathBuf::from(&mic_path);
     let transcriber_clone = transcriber.clone();
-    let mic_result = tokio::task::spawn_blocking(move || transcriber_clone.transcribe(&mic_path_buf))
+    let lang = language.clone();
+    let mic_result = tokio::task::spawn_blocking(move || transcriber_clone.transcribe(&mic_path_buf, lang))
         .await
         .map_err(|e| {
             state.is_transcribing.store(false, Ordering::SeqCst);
@@ -357,8 +361,9 @@ pub async fn transcribe_dual_audio(
     let system_result = if let Some(sys_path) = system_path {
         let sys_path_buf = PathBuf::from(&sys_path);
         let transcriber_clone = transcriber.clone();
+        let lang = language.clone();
 
-        match tokio::task::spawn_blocking(move || transcriber_clone.transcribe(&sys_path_buf)).await {
+        match tokio::task::spawn_blocking(move || transcriber_clone.transcribe(&sys_path_buf, lang)).await {
             Ok(Ok(result)) => {
                 // Save system segments to database with "Others" speaker label (skip blank/noise)
                 for segment in &result.segments {

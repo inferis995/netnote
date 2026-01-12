@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { audioApi } from "../api";
 import { RecordingPhase } from "../types";
 
+import { useSettingsStore } from "../stores/settingsStore";
+
 interface UseRecordingReturn {
   isRecording: boolean;
   isPaused: boolean;
@@ -30,28 +32,44 @@ export function useRecording(): UseRecordingReturn {
   const levelIntervalRef = useRef<number | null>(null);
   const currentNoteIdRef = useRef<string | null>(null);
 
+  // Load settings
+  const audioSource = useSettingsStore((state) => state.audioSource);
+  const selectedMicId = useSettingsStore((state) => state.selectedMicId);
+  const loadSettings = useSettingsStore((state) => state.loadSettings);
+
+  // Ensure settings are loaded on mount
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
   const startRecording = useCallback(async (noteId: string) => {
     try {
       setError(null);
       currentNoteIdRef.current = noteId;
 
-      // Check if system audio is supported and has permission
-      const isSupported = await audioApi.isSystemAudioSupported();
-      const hasPermission = isSupported
+      // Determine if we should try system audio based on settings
+      let trySystemAudio = audioSource === "auto";
+
+      // If setting allows, check if system supports it
+      if (trySystemAudio) {
+        trySystemAudio = await audioApi.isSystemAudioSupported();
+      }
+
+      const hasPermission = trySystemAudio
         ? await audioApi.hasSystemAudioPermission()
         : false;
 
-      if (isSupported && hasPermission) {
+      if (trySystemAudio && hasPermission) {
         // Use dual recording (mic + system audio)
-        console.log("Starting dual recording (mic + system audio)");
-        const result = await audioApi.startDualRecording(noteId);
+        console.log("Starting dual recording (mic + system audio). Mic:", selectedMicId || "Default");
+        const result = await audioApi.startDualRecording(noteId, selectedMicId);
         // Use the playback path if available, otherwise mic path
         setAudioPath(result.playbackPath || result.systemPath || result.micPath);
         setIsDualRecording(true);
       } else {
         // Fall back to mic-only recording
-        console.log("Starting mic-only recording");
-        const path = await audioApi.startRecording(noteId);
+        console.log("Starting mic-only recording. Mic:", selectedMicId || "Default");
+        const path = await audioApi.startRecording(noteId, selectedMicId);
         setAudioPath(path);
         setIsDualRecording(false);
       }
@@ -59,7 +77,7 @@ export function useRecording(): UseRecordingReturn {
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
-  }, []);
+  }, [audioSource, selectedMicId]); // Add audioSource and selectedMicId dependency
 
   const stopRecording = useCallback(
     async (noteId?: string): Promise<string | null> => {
@@ -100,8 +118,14 @@ export function useRecording(): UseRecordingReturn {
   const pauseRecording = useCallback(async () => {
     try {
       setError(null);
-      console.log("Pausing dual recording");
-      await audioApi.pauseDualRecording();
+      if (isDualRecording) {
+        console.log("Pausing dual recording");
+        await audioApi.pauseDualRecording();
+      } else {
+        // For mic-only, stop the recording (pause not supported for simple mic recording)
+        console.log("Pausing mic-only recording (stopping)");
+        await audioApi.stopRecording();
+      }
       setIsRecording(false);
       setIsPaused(true);
       setRecordingPhase(RecordingPhase.Paused);
@@ -109,39 +133,78 @@ export function useRecording(): UseRecordingReturn {
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
-  }, []);
+  }, [isDualRecording]);
 
   const resumeRecording = useCallback(async (noteId: string) => {
     try {
       setError(null);
-      console.log("Resuming dual recording");
-      const result = await audioApi.resumeDualRecording(noteId);
-      setAudioPath(result.playbackPath || result.systemPath || result.micPath);
+      currentNoteIdRef.current = noteId;
+
+      // Check if we should use dual recording based on audioSource setting
+      const useDualRecording = audioSource === "auto";
+
+      if (useDualRecording) {
+        console.log("Resuming dual recording (mic + system audio)");
+        const result = await audioApi.resumeDualRecording(noteId);
+        setAudioPath(result.playbackPath || result.systemPath || result.micPath);
+        setIsDualRecording(result.systemPath !== null);
+      } else {
+        // User explicitly chose mic-only mode ("In Loco")
+        // For resume, we need to continue the mic recording
+        console.log("Resuming mic-only recording (In Loco mode). Mic:", selectedMicId || "Default");
+        const path = await audioApi.startRecording(noteId, selectedMicId);
+        setAudioPath(path);
+        setIsDualRecording(false);
+      }
+
       setIsRecording(true);
       setIsPaused(false);
       setRecordingPhase(RecordingPhase.Recording);
-      setIsDualRecording(result.systemPath !== null);
-      currentNoteIdRef.current = noteId;
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
-  }, []);
+  }, [audioSource, selectedMicId]);
 
   const continueRecording = useCallback(async (noteId: string) => {
     try {
       setError(null);
-      console.log("Continuing recording on ended note");
-      const result = await audioApi.continueNoteRecording(noteId);
-      setAudioPath(result.playbackPath || result.systemPath || result.micPath);
+      currentNoteIdRef.current = noteId;
+
+      // Check if we should use dual recording based on audioSource setting
+      const useDualRecording = audioSource === "auto";
+
+      if (useDualRecording) {
+        // Check if system audio is supported and has permission
+        const supported = await audioApi.isSystemAudioSupported();
+        const hasPermission = supported ? await audioApi.hasSystemAudioPermission() : false;
+
+        if (supported && hasPermission) {
+          console.log("Continuing with dual recording (mic + system audio). Mic:", selectedMicId || "Default");
+          const result = await audioApi.continueNoteRecording(noteId, selectedMicId);
+          setAudioPath(result.playbackPath || result.systemPath || result.micPath);
+          setIsDualRecording(true);
+        } else {
+          // Fall back to mic-only
+          console.log("System audio not available, continuing with mic-only. Mic:", selectedMicId || "Default");
+          const path = await audioApi.startRecording(noteId, selectedMicId);
+          setAudioPath(path);
+          setIsDualRecording(false);
+        }
+      } else {
+        // User explicitly chose mic-only mode ("In Loco")
+        console.log("Continuing with mic-only recording (In Loco mode). Mic:", selectedMicId || "Default");
+        const path = await audioApi.startRecording(noteId, selectedMicId);
+        setAudioPath(path);
+        setIsDualRecording(false);
+      }
+
       setIsRecording(true);
       setIsPaused(false);
       setRecordingPhase(RecordingPhase.Recording);
-      setIsDualRecording(result.systemPath !== null);
-      currentNoteIdRef.current = noteId;
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
-  }, []);
+  }, [audioSource, selectedMicId]);
 
   // Poll audio level while recording
   useEffect(() => {

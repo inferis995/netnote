@@ -251,7 +251,7 @@ export function TranscriptSearch({ segments, onSegmentClick, isLive = false }: T
             <div
               key={group.ids[0]}
               onClick={() => onSegmentClick?.(group.segments[0])}
-              className="w-full flex gap-4 text-left px-4 py-3 rounded-xl transition-colors hover:bg-black/5 cursor-pointer"
+              className="w-full flex gap-4 text-left px-4 py-3 rounded-xl transition-colors hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
             >
               <span
                 className="text-sm font-mono shrink-0 pt-0.5"

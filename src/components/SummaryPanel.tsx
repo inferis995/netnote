@@ -187,7 +187,7 @@ export function SummaryPanel({
                           e.stopPropagation();
                           handleCopy(summary.id, summary.content);
                         }}
-                        className="p-1.5 rounded-lg transition-colors hover:bg-black/5"
+                        className="p-1.5 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5"
                         style={{ color: "var(--color-text-tertiary)" }}
                         title="Copy"
                       >
@@ -201,7 +201,7 @@ export function SummaryPanel({
                             e.stopPropagation();
                             onDelete(summary.id);
                           }}
-                          className="p-1.5 rounded-lg transition-colors hover:bg-black/5"
+                          className="p-1.5 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5"
                           style={{ color: "var(--color-text-tertiary)" }}
                           title="Delete"
                         >

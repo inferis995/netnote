@@ -12,8 +12,8 @@ export interface DualRecordingResult {
 
 export const audioApi = {
   // Basic recording (mic only)
-  startRecording: (noteId: string): Promise<string> => {
-    return invoke("start_recording", { noteId });
+  startRecording: (noteId: string, deviceId?: string | null): Promise<string> => {
+    return invoke("start_recording", { noteId, deviceId });
   },
 
   stopRecording: (): Promise<string | null> => {
@@ -46,8 +46,8 @@ export const audioApi = {
 
   // Dual recording (mic + system audio)
   /** Start recording both mic and system audio */
-  startDualRecording: (noteId: string): Promise<DualRecordingResult> => {
-    return invoke("start_dual_recording", { noteId });
+  startDualRecording: (noteId: string, micDeviceId?: string | null): Promise<DualRecordingResult> => {
+    return invoke("start_dual_recording", { noteId, micDeviceId });
   },
 
   /** Stop dual recording and merge files for playback */
@@ -90,13 +90,14 @@ export const audioApi = {
 
   /** Start dual recording with segment tracking */
   startDualRecordingWithSegments: (
-    noteId: string
+    noteId: string,
+    micDeviceId?: string | null
   ): Promise<DualRecordingResult> => {
-    return invoke("start_dual_recording_with_segments", { noteId });
+    return invoke("start_dual_recording_with_segments", { noteId, micDeviceId });
   },
 
   /** Continue recording on an ended note */
-  continueNoteRecording: (noteId: string): Promise<DualRecordingResult> => {
-    return invoke("continue_note_recording", { noteId });
+  continueNoteRecording: (noteId: string, micDeviceId?: string | null): Promise<DualRecordingResult> => {
+    return invoke("continue_note_recording", { noteId, micDeviceId });
   },
 };

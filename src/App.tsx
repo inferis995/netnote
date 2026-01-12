@@ -1,8 +1,7 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import {
-  LogoImage,
   Settings,
   SummaryPanel,
   TranscriptSearch,
@@ -11,6 +10,7 @@ import {
   UpdateNotification,
   MeetingDetectedPopup,
 } from "./components";
+import { Dashboard } from "./components/Dashboard";
 import { AvatarIcons } from "./components/settings/AvatarIcons";
 import { exportApi, aiApi } from "./api";
 import {
@@ -475,22 +475,17 @@ function App() {
     setEditingDescription(false);
   };
 
-  const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString([], {
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  };
+
 
   return (
     <div className="h-screen flex">
       {/* Sidebar */}
       <aside
-        className="flex flex-col border-r"
+        className="flex flex-col"
         style={{
           width: "var(--sidebar-width)",
           backgroundColor: "var(--color-sidebar)",
-          borderColor: "var(--color-border)",
+          borderRight: "1px solid var(--color-border)",
         }}
       >
         {/* Sidebar Header */}
@@ -503,7 +498,7 @@ function App() {
           </span>
           <button
             onClick={handleNewNote}
-            className="p-2 rounded-lg hover:bg-black/5 transition-colors"
+            className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
             title="Nuova Nota (⌘N)"
           >
             <svg
@@ -564,11 +559,16 @@ function App() {
                     data-note-id={note.id}
                     onClick={() => handleSelectNote(note)}
                     onContextMenu={(e) => handleNoteContextMenu(e, note)}
-                    className="w-full px-4 py-2 text-left transition-colors"
+                    className="mx-2 mb-1 px-3 py-2.5 rounded-xl text-left transition-all duration-200 border border-transparent"
                     style={{
+                      width: "calc(100% - 16px)",
                       backgroundColor:
                         selectedNoteId === note.id
                           ? "var(--color-sidebar-selected)"
+                          : "transparent",
+                      borderColor:
+                        selectedNoteId === note.id
+                          ? "var(--color-border)"
                           : "transparent",
                     }}
                     onMouseEnter={(e) => {
@@ -593,7 +593,13 @@ function App() {
                       className="text-xs"
                       style={{ color: "var(--color-text-secondary)" }}
                     >
-                      {formatTime(note.started_at)}
+                      <span className="text-sm font-medium text-[var(--color-text-secondary)]">
+                        {(() => {
+                          if (!note.updated_at) return "Oggi";
+                          const d = new Date(note.updated_at);
+                          return isNaN(d.getTime()) ? "Oggi" : d.toLocaleDateString("it-IT", { day: 'numeric', month: 'long' });
+                        })()}
+                      </span>
                       {isRecording && recordingNoteId === note.id && (
                         <span
                           className="ml-2 px-1.5 py-0.5 rounded text-xs font-medium"
@@ -649,7 +655,7 @@ function App() {
               setSettingsTab("about");
               setShowSettings(true);
             }}
-            className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-black/5 transition-colors"
+            className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center text-sm shrink-0 transition-colors"
@@ -808,11 +814,17 @@ function App() {
             onClose={() => setSelectedNoteId(null)}
           />
         ) : (
-          <EmptyState
-            needsSetup={!loadedModel || !ollamaRunning || !ollamaModel}
+          <Dashboard
+            onNewNote={handleNewNote}
+            recentNotes={notes.slice(0, 3)}
+            onSelectNote={handleSelectNote}
             onOpenSettings={() => {
-              setSettingsTab("whisper");
+              setSettingsTab("profile");
               setShowSettings(true);
+            }}
+            stats={{
+              totalNotes: notes.length,
+              totalRecordings: notes.filter((n) => n.audio_path).length,
             }}
           />
         )}
@@ -859,7 +871,7 @@ function App() {
                   className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm shadow-md transition-transform hover:scale-105"
                   style={{
                     backgroundColor: "var(--color-accent)",
-                    color: "white",
+                    color: "var(--color-accent-text)",
                   }}
                 >
                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -909,11 +921,11 @@ function App() {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm shadow-md transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 hover:scale-105"
                 style={{
                   backgroundColor: "var(--color-accent)",
-                  color: "white",
+                  color: "var(--color-accent-text)",
                 }}
                 title={!loadedModel || !ollamaRunning || !ollamaModel ? "Complete setup in Settings first" : undefined}
               >
-                <span className="w-2 h-2 rounded-full bg-white" />
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "var(--color-accent-text)" }} />
                 Inizia ad ascoltare
               </button>
             )}
@@ -970,136 +982,8 @@ function App() {
   );
 }
 
-interface EmptyStateProps {
-  needsSetup: boolean;
-  onOpenSettings: () => void;
-}
 
-function EmptyState({ needsSetup, onOpenSettings }: EmptyStateProps) {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center pb-20">
-      <div className="text-center max-w-sm px-6">
-        <LogoImage className="w-32 h-auto mx-auto mb-4" />
-        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Seleziona una nota o creane una nuova
-        </p>
-        <div
-          className="mt-4 flex flex-col items-start gap-2 text-xs mx-auto w-fit"
-          style={{ color: "var(--color-text-tertiary)" }}
-        >
-          <div className="flex items-center gap-2">
-            <kbd
-              className="px-1.5 py-0.5 rounded font-medium"
-              style={{
-                backgroundColor: "var(--color-sidebar)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              ⌘
-            </kbd>
-            <kbd
-              className="px-1.5 py-0.5 rounded font-medium"
-              style={{
-                backgroundColor: "var(--color-sidebar)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              N
-            </kbd>
-            <span>nuova nota</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd
-              className="px-1.5 py-0.5 rounded font-medium"
-              style={{
-                backgroundColor: "var(--color-sidebar)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              ⌘
-            </kbd>
-            <kbd
-              className="px-1.5 py-0.5 rounded font-medium"
-              style={{
-                backgroundColor: "var(--color-sidebar)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              R
-            </kbd>
-            <span>inizia registrazione</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd
-              className="px-1.5 py-0.5 rounded font-medium"
-              style={{
-                backgroundColor: "var(--color-sidebar)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              ⌘
-            </kbd>
-            <kbd
-              className="px-1.5 py-0.5 rounded font-medium"
-              style={{
-                backgroundColor: "var(--color-sidebar)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              M
-            </kbd>
-            <span>cambia tema</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd
-              className="px-1.5 py-0.5 rounded font-medium"
-              style={{
-                backgroundColor: "var(--color-sidebar)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              ⌘
-            </kbd>
-            <kbd
-              className="px-1.5 py-0.5 rounded font-medium"
-              style={{
-                backgroundColor: "var(--color-sidebar)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              ,
-            </kbd>
-            <span>impostazioni</span>
-          </div>
-        </div>
-        {needsSetup && (
-          <button
-            onClick={onOpenSettings}
-            className="mt-4 flex items-center gap-2 mx-auto px-3 py-2 text-sm rounded-lg transition-colors hover:bg-black/5"
-            style={{
-              color: "var(--color-text-secondary)",
-              border: "1px solid var(--color-border)",
-            }}
-          >
-            <svg
-              className="w-4 h-4"
-              style={{ color: "#f59e0b" }}
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Configura Whisper & Ollama
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
+
 
 interface NoteViewProps {
   note: Note;
@@ -1176,7 +1060,7 @@ function NoteView({
         {/* Close button */}
         <button
           onClick={onClose}
-          className="p-1.5 rounded-md hover:bg-black/5 transition-colors shrink-0"
+          className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors shrink-0"
           title="Chiudi"
         >
           <svg
@@ -1203,7 +1087,7 @@ function NoteView({
               onBlur={() => onUpdateTitle(titleValue)}
               onKeyDown={(e) => e.key === "Enter" && onUpdateTitle(titleValue)}
               className="text-xl font-semibold w-full"
-              style={{ color: "var(--color-text)" }}
+              style={{ color: "var(--color-text)", backgroundColor: "transparent" }}
             />
           ) : (
             <h1
@@ -1291,7 +1175,7 @@ function NoteView({
               </button>
               <button
                 onClick={onExport}
-                className="p-1 rounded-md hover:bg-black/5"
+                className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5"
                 title="Esporta"
               >
                 <svg
@@ -1314,7 +1198,7 @@ function NoteView({
           {!isRecording && !isPaused && (
             <button
               onClick={onDelete}
-              className="p-1 rounded-md hover:bg-black/5"
+              className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5"
               title="Elimina"
             >
               <svg
@@ -1386,48 +1270,40 @@ function NoteView({
       )}
 
       {/* Tabs */}
-      <div
-        className="px-6 border-b flex gap-6"
-        style={{ borderColor: "var(--color-border)" }}
-      >
-        {(["notes", "transcript", "summary"] as const).map((tab) => (
+      <div className="flex px-6 border-b" style={{ borderColor: "var(--color-border)" }}>
+        {[
+          { id: "notes", label: "Note" },
+          { id: "transcript", label: "Trascrizione" },
+          { id: "summary", label: "Riassunto" },
+        ].map((tabItem) => (
           <button
-            key={tab}
-            onClick={() => onTabChange(tab)}
-            className="py-2.5 text-sm font-medium capitalize transition-colors"
+            key={tabItem.id}
+            onClick={() => onTabChange(tabItem.id as any)}
+            className="group relative px-6 py-3 text-sm font-medium transition-colors"
             style={{
-              color:
-                activeTab === tab
-                  ? "var(--color-text)"
-                  : "var(--color-text-secondary)",
-              borderBottom:
-                activeTab === tab
-                  ? "2px solid var(--color-text)"
-                  : "2px solid transparent",
-              marginBottom: "-1px",
+              color: activeTab === tabItem.id ? "var(--color-text)" : "var(--color-text-secondary)",
             }}
           >
-            {tab}
-            {tab === "transcript" && transcript.length > 0 && (
-              <span
-                className="ml-1.5 text-sm"
-                style={{ color: "var(--color-text-secondary)" }}
-              >
-                ({transcript.length})
-              </span>
+            {tabItem.label}
+            {tabItem.id === "transcript" && transcript.length > 0 && (
+              <span className="ml-1.5 opacity-60">({transcript.length})</span>
             )}
-            {tab === "summary" && summaries.length > 0 && (
-              <span
-                className="ml-1.5 text-sm"
-                style={{ color: "var(--color-text-secondary)" }}
-              >
-                ({summaries.length})
-              </span>
+            {tabItem.id === "summary" && summaries.length > 0 && (
+              <span className="ml-1.5 opacity-60">({summaries.length})</span>
+            )}
+
+            {/* Active Indicator */}
+            {activeTab === tabItem.id && (
+              <div
+                className="absolute bottom-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: "var(--color-accent)" }}
+              />
             )}
           </button>
         ))}
         {/* Generate/Regenerate button - only show on summary tab when ready */}
-        {activeTab === "summary" &&
+        {
+          activeTab === "summary" &&
           !isRecording &&
           !isTranscribing &&
           !isGenerating &&
@@ -1445,25 +1321,27 @@ function NoteView({
             >
               {summaries.length === 0 ? "Genera" : "Rigenera"}
             </button>
-          )}
-      </div>
+          )
+        }
+      </div >
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-4">
+      < div className="flex-1 overflow-y-auto px-6 py-4" >
         {activeTab === "notes" && (
           <div className="h-full">
             <textarea
               value={descValue}
               onChange={(e) => setDescValue(e.target.value)}
               onBlur={() => onUpdateDescription(descValue)}
-              placeholder="Prendi appunti o premi / per i comandi..."
-              className="w-full h-full text-base leading-relaxed resize-none"
-              style={{ color: "var(--color-text)" }}
+              placeholder="Scrivi una nota..."
+              className="w-full h-full text-base leading-relaxed resize-none placeholder:text-[var(--color-text-placeholder)]"
+              style={{ color: "var(--color-text)", backgroundColor: "transparent" }}
             />
           </div>
         )}
 
-        {activeTab === "transcript" &&
+        {
+          activeTab === "transcript" &&
           (transcript.length > 0 ? (
             <TranscriptSearch segments={transcript} isLive={isRecording} />
           ) : (
@@ -1475,30 +1353,35 @@ function NoteView({
                 ? "Trascrivi questa nota per vedere la trascrizione"
                 : "Nessun audio registrato"}
             </div>
-          ))}
+          ))
+        }
 
-        {activeTab === "summary" && (
-          <SummaryPanel
-            summaries={summaries}
-            isGenerating={isGenerating}
-            streamingContent={streamingContent}
-            onDelete={deleteSummary}
-            onCopy={async (content) => {
-              try {
-                await exportApi.copyToClipboard(content);
-              } catch (error) {
-                console.error("Copy failed:", error);
-              }
-            }}
-          />
-        )}
-      </div>
+        {
+          activeTab === "summary" && (
+            <SummaryPanel
+              summaries={summaries}
+              isGenerating={isGenerating}
+              streamingContent={streamingContent}
+              onDelete={deleteSummary}
+              onCopy={async (content) => {
+                try {
+                  await exportApi.copyToClipboard(content);
+                } catch (error) {
+                  console.error("Copy failed:", error);
+                }
+              }}
+            />
+          )
+        }
+      </div >
 
       {/* Audio Player - show when note has audio and not recording */}
-      {!isRecording && note.audio_path && (
-        <AudioPlayer audioPath={note.audio_path} title={note.title} />
-      )}
-    </div>
+      {
+        !isRecording && note.audio_path && (
+          <AudioPlayer audioPath={note.audio_path} title={note.title} />
+        )
+      }
+    </div >
   );
 }
 
@@ -1683,13 +1566,13 @@ function ContextMenu({ x, y, type, onAction }: ContextMenuProps) {
   return (
     <div
       ref={menuRef}
-      className="fixed z-[100] min-w-[160px] py-1.5 rounded-lg"
+      className="fixed z-[100] min-w-[160px] py-1.5 rounded-lg border"
       style={{
         left: x,
         top: y,
         backgroundColor: "var(--color-bg-elevated)",
-        boxShadow:
-          "0 4px 12px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)",
+        borderColor: "var(--color-border)",
+        boxShadow: "var(--shadow-lg)",
       }}
     >
       {menuItems.map((item) => {
@@ -1698,7 +1581,13 @@ function ContextMenu({ x, y, type, onAction }: ContextMenuProps) {
           <button
             key={item.id}
             onClick={() => onAction(item.id)}
-            className="w-full px-3 py-1.5 flex items-center gap-2.5 text-sm transition-colors hover:bg-black/5"
+            className="w-full px-3 py-1.5 flex items-center gap-2.5 text-sm transition-colors"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--color-sidebar-hover)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
             style={{
               color: isDanger ? "#ef4444" : "var(--color-text)",
             }}

@@ -50,18 +50,20 @@ export const transcriptionApi = {
   transcribeAudio: (
     audioPath: string,
     noteId: string,
+    language?: string,
     speaker?: string
   ): Promise<TranscriptionResult> => {
-    return invoke("transcribe_audio", { audioPath, noteId, speaker });
+    return invoke("transcribe_audio", { audioPath, noteId, language, speaker });
   },
 
   /** Transcribe dual audio files (mic and system) with speaker labels */
   transcribeDualAudio: (
     micPath: string,
     systemPath: string | null,
-    noteId: string
+    noteId: string,
+    language?: string
   ): Promise<DualTranscriptionResult> => {
-    return invoke("transcribe_dual_audio", { micPath, systemPath, noteId });
+    return invoke("transcribe_dual_audio", { micPath, systemPath, noteId, language });
   },
 
   isTranscribing: (): Promise<boolean> => {

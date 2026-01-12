@@ -91,7 +91,11 @@ export function useTranscription(): UseTranscriptionReturn {
       try {
         setError(null);
         setIsTranscribing(true);
-        const result = await transcriptionApi.transcribeAudio(audioPath, noteId);
+        // Get language from store
+        const language = useWhisperStore.getState().language;
+        const langParam = language === "auto" ? undefined : language;
+
+        const result = await transcriptionApi.transcribeAudio(audioPath, noteId, langParam);
         // Convert result segments to TranscriptSegment format
         const segments: TranscriptSegment[] = result.segments.map((s, idx) => ({
           id: idx,
@@ -123,10 +127,15 @@ export function useTranscription(): UseTranscriptionReturn {
       try {
         setError(null);
         setIsTranscribing(true);
+        // Get language from store
+        const language = useWhisperStore.getState().language;
+        const langParam = language === "auto" ? undefined : language;
+
         const result = await transcriptionApi.transcribeDualAudio(
           micPath,
           systemPath,
-          noteId
+          noteId,
+          langParam
         );
 
         // Load the transcript from database (includes both "You" and "Others" segments)

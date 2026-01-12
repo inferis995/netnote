@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { useSettingsStore } from "../../stores/settingsStore";
+
+interface AudioDeviceInfo {
+  id: string;
+  name: string;
+  is_default: boolean;
+}
 
 interface SystemTabProps {
   onPermissionChange?: () => void;
@@ -18,6 +25,12 @@ export function SystemTab({ onPermissionChange }: SystemTabProps) {
   const [micAuthStatus, setMicAuthStatus] = useState<number>(0); // 0=NotDetermined, 1=Restricted, 2=Denied, 3=Authorized
   const [micLoading, setMicLoading] = useState(true);
   const [refreshingMic, setRefreshingMic] = useState(false);
+
+  // New Stores
+  const { audioSource, setAudioSource, selectedMicId, setSelectedMicId } = useSettingsStore();
+
+  const [inputDevices, setInputDevices] = useState<AudioDeviceInfo[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState(false);
 
   useEffect(() => {
     invoke<boolean>("get_autostart_enabled")
@@ -63,6 +76,26 @@ export function SystemTab({ onPermissionChange }: SystemTabProps) {
       .catch((err) => {
         console.error("Failed to check microphone:", err);
         setMicLoading(false);
+      });
+
+    // Load available input devices
+    setLoadingDevices(true);
+    invoke<AudioDeviceInfo[]>("get_audio_input_devices")
+      .then((devices) => {
+        setInputDevices(devices);
+        setLoadingDevices(false);
+        // If no mic selected yet, try to find default
+        if (!selectedMicId) {
+          const defaultDevice = devices.find(d => d.is_default);
+          if (defaultDevice) {
+            // Don't auto-set store to avoid overriding "default" semantic if user prefers explicit
+            // But for now, let's leave selectedMicId as null = default
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load input devices:", err);
+        setLoadingDevices(false);
       });
   }, []);
 
@@ -236,6 +269,64 @@ export function SystemTab({ onPermissionChange }: SystemTabProps) {
         </div>
       </button>
 
+      {/* Modalità Meeting */}
+      <div className="pt-4">
+        <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-text)" }}>
+          Modalità Meeting
+        </h3>
+        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+          Scegli come catturare l'audio in base al tipo di riunione.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* In Loco */}
+          <button
+            onClick={() => setAudioSource("mic_only")}
+            className={`relative p-4 rounded-xl border text-left transition-all ${audioSource === "mic_only" ? "ring-2 ring-[var(--color-accent)]" : "hover:bg-[var(--color-bg-subtle)]"}`}
+            style={{
+              backgroundColor: "var(--color-bg-elevated)",
+              borderColor: audioSource === "mic_only" ? "var(--color-accent)" : "var(--color-border)"
+            }}
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: audioSource === "mic_only" ? "var(--color-accent-light)" : "var(--color-bg-subtle)" }}>
+                <svg className="w-6 h-6" fill="none" stroke={audioSource === "mic_only" ? "var(--color-accent)" : "currentColor"} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              {audioSource === "mic_only" && (
+                <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent)]" />
+              )}
+            </div>
+            <div className="font-medium mb-1" style={{ color: "var(--color-text)" }}>🏢 In Loco</div>
+            <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Usa solo il microfono. Ignora l'audio del computer. Ideale per riunioni dal vivo.</div>
+          </button>
+
+          {/* Remoto */}
+          <button
+            onClick={() => setAudioSource("auto")}
+            className={`relative p-4 rounded-xl border text-left transition-all ${audioSource === "auto" ? "ring-2 ring-[var(--color-accent)]" : "hover:bg-[var(--color-bg-subtle)]"}`}
+            style={{
+              backgroundColor: "var(--color-bg-elevated)",
+              borderColor: audioSource === "auto" ? "var(--color-accent)" : "var(--color-border)"
+            }}
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: audioSource === "auto" ? "var(--color-accent-light)" : "var(--color-bg-subtle)" }}>
+                <svg className="w-6 h-6" fill="none" stroke={audioSource === "auto" ? "var(--color-accent)" : "currentColor"} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </div>
+              {audioSource === "auto" && (
+                <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent)]" />
+              )}
+            </div>
+            <div className="font-medium mb-1" style={{ color: "var(--color-text)" }}>💻 Call Remota</div>
+            <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Registra microfono e audio del sistema (Zoom, Meet). Ideale per call online.</div>
+          </button>
+        </div>
+      </div>
+
       {/* Microphone Section */}
       <div className="pt-4">
         <h3
@@ -356,6 +447,36 @@ export function SystemTab({ onPermissionChange }: SystemTabProps) {
             </span>
           )}
         </div>
+
+        {/* Device Selection Dropdown */}
+        {micAvailable && micPermission && (
+          <div className="mt-4 px-1">
+            <label className="block text-xs font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
+              Dispositivo di Input
+            </label>
+            <select
+              value={selectedMicId || ""}
+              onChange={(e) => setSelectedMicId(e.target.value || null)}
+              disabled={loadingDevices}
+              className="w-full p-2.5 rounded-lg text-sm border bg-transparent"
+              style={{
+                borderColor: "var(--color-border)",
+                color: "var(--color-text)",
+                outline: "none"
+              }}
+            >
+              <option value="">Predefinito di Sistema</option>
+              {inputDevices.map((device) => (
+                <option key={device.id} value={device.id}>
+                  {device.name} {device.is_default ? "(Predefinito)" : ""}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1.5 text-xs" style={{ color: "var(--color-text-tertiary)" }}>
+              Seleziona "Predefinito di Sistema" per usare il microfono impostato su Windows.
+            </p>
+          </div>
+        )}
 
         {!micLoading && !micAvailable && (
           <div
