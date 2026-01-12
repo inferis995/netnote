@@ -56,6 +56,10 @@ whisper-rs = { version = "0.13", features = ["metal"] }
 wasapi = "0.16"
 whisper-rs = { version = "0.13", features = ["vulkan"] }
 
+# Linux-specific dependencies
+[target.'cfg(target_os = "linux")'.dependencies]
+whisper-rs = "0.13"
+
 [profile.dev]
 incremental = true
 
