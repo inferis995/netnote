@@ -11,9 +11,16 @@ use meeting_detection::MeetingDetectionState;
 use serde::Deserialize;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
 
 /// Tracks whether the app was launched with --minimized flag (e.g., via autostart)
 static STARTED_MINIMIZED: AtomicBool = AtomicBool::new(false);
+
+/// Tracks whether the main window has been shown by frontend
+/// Used for timeout fallback to prevent invisible window on Linux
+static WINDOW_SHOWN: AtomicBool = AtomicBool::new(false);
+
 use tauri::{
     image::Image,
     menu::{Menu, MenuItem},
@@ -110,6 +117,9 @@ fn greet(name: &str) -> String {
 /// Only shows if the app was NOT started with --minimized flag.
 #[tauri::command]
 fn show_main_window(app: tauri::AppHandle) {
+    // Mark that the window has been shown by frontend
+    WINDOW_SHOWN.store(true, Ordering::Relaxed);
+
     // Don't show window if started with --minimized (autostart)
     if STARTED_MINIMIZED.load(Ordering::Relaxed) {
         return;
@@ -156,6 +166,24 @@ pub fn run() {
 
             // Start meeting detection
             meeting_detection::start_meeting_detection(app.handle());
+
+            // START: Timeout fallback for window show on Linux
+            // If the frontend doesn't call show_main_window within 5 seconds,
+            // show the window anyway to prevent invisible window bug on Linux
+            let app_handle = app.handle().clone();
+            thread::spawn(move || {
+                thread::sleep(Duration::from_secs(5));
+                
+                // Only show if not already shown by frontend and not minimized
+                if !WINDOW_SHOWN.load(Ordering::Relaxed) && !STARTED_MINIMIZED.load(Ordering::Relaxed) {
+                    if let Some(window) = app_handle.get_webview_window("main") {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                        eprintln!("[NetNote] Window shown via timeout fallback - frontend may have failed to load");
+                    }
+                }
+            });
+            // END: Timeout fallback
 
             // Create custom application menu (macOS) with Hide instead of Quit on Cmd+Q
             #[cfg(target_os = "macos")]
