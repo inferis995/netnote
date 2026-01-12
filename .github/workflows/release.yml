@@ -78,11 +78,10 @@ jobs:
 
       - name: Install Vulkan SDK (Windows)
         if: matrix.platform == 'windows-latest'
-        uses: humbletim/setup-vulkan-sdk@v1.2.0
-        with:
-          vulkan-query-version: 1.3.204.0
-          vulkan-components: Vulkan-Headers, Vulkan-Loader
-          vulkan-use-cache: true
+        run: |
+          curl -L -o VulkanSDK.exe https://sdk.lunarg.com/sdk/download/1.3.280.0/windows/VulkanSDK-1.3.280.0-Installer.exe
+          ./VulkanSDK.exe --accept-licenses --default-answer --confirm-command install
+          echo "VULKAN_SDK=C:\VulkanSDK\1.3.280.0" >> $GITHUB_ENV
 
       - name: Install frontend dependencies
         run: npm install
