@@ -1,6 +1,6 @@
 [package]
 name = "netnote"
-version = "1.0.2"
+version = "1.0.4"
 description = "A private, local notes assistant"
 authors = ["you"]
 license = "AGPL-3.0-or-later"
@@ -55,6 +55,10 @@ whisper-rs = { version = "0.13", features = ["metal"] }
 [target.'cfg(target_os = "windows")'.dependencies]
 wasapi = "0.16"
 whisper-rs = { version = "0.13", features = ["vulkan"] }
+
+# Linux-specific dependencies
+[target.'cfg(target_os = "linux")'.dependencies]
+whisper-rs = "0.13"
 
 [profile.dev]
 incremental = true
