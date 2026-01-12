@@ -43,11 +43,15 @@ jobs:
 
       - name: Install Vulkan SDK (Windows)
         if: matrix.platform == 'windows-latest'
+        shell: powershell
         run: |
-          choco install vulkan-sdk -y
-          $VULKAN_PATH = Get-ChildItem "C:\VulkanSDK" | Select-Object -First 1 -ExpandProperty FullName
-          echo "VULKAN_SDK=$VULKAN_PATH" >> $env:GITHUB_ENV
-          echo "$VULKAN_PATH\Bin" >> $env:GITHUB_PATH
+          Write-Host "Downloading Vulkan SDK..."
+          Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.3.290.0/windows/VulkanSDK-1.3.290.0-Installer.exe" -OutFile "$env:TEMP\VulkanSDK.exe"
+          Write-Host "Installing Vulkan SDK..."
+          Start-Process -FilePath "$env:TEMP\VulkanSDK.exe" -ArgumentList "/S" -Wait
+          Write-Host "Setting environment variables..."
+          echo "VULKAN_SDK=C:\VulkanSDK\1.3.290.0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "C:\VulkanSDK\1.3.290.0\Bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Install frontend dependencies
         run: npm install
