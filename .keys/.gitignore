@@ -1,6 +1,0 @@
-# Ignore keys except this folder structure
-!.keys/
-.keys/*
-!.keys/README.md
-!.keys/*.key
-!.keys/*.pub
