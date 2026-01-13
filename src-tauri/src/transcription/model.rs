@@ -30,33 +30,33 @@ impl ModelSize {
     /// Get download URL for the model from Hugging Face
     pub fn download_url(&self) -> &'static str {
         match self {
-            ModelSize::Tiny => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin",
-            ModelSize::Base => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin",
-            ModelSize::Small => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin",
-            ModelSize::Medium => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin",
-            ModelSize::Large => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin",
+            ModelSize::Tiny => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny-q5_1.bin",
+            ModelSize::Base => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base-q5_1.bin",
+            ModelSize::Small => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q5_1.bin",
+            ModelSize::Medium => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium-q5_0.bin",
+            ModelSize::Large => "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-q5_0.bin",
         }
     }
 
     /// Get approximate file size in MB
     pub fn size_mb(&self) -> u64 {
         match self {
-            ModelSize::Tiny => 75,
-            ModelSize::Base => 142,
-            ModelSize::Small => 466,
-            ModelSize::Medium => 1500,
-            ModelSize::Large => 3100,
+            ModelSize::Tiny => 31,
+            ModelSize::Base => 57,
+            ModelSize::Small => 182,
+            ModelSize::Medium => 515,
+            ModelSize::Large => 1030,
         }
     }
 
     /// Get filename for the model
     pub fn filename(&self) -> &'static str {
         match self {
-            ModelSize::Tiny => "ggml-tiny.bin",
-            ModelSize::Base => "ggml-base.bin",
-            ModelSize::Small => "ggml-small.bin",
-            ModelSize::Medium => "ggml-medium.bin",
-            ModelSize::Large => "ggml-large-v3.bin",
+            ModelSize::Tiny => "ggml-tiny-q5_1.bin",
+            ModelSize::Base => "ggml-base-q5_1.bin",
+            ModelSize::Small => "ggml-small-q5_1.bin",
+            ModelSize::Medium => "ggml-medium-q5_0.bin",
+            ModelSize::Large => "ggml-large-v3-q5_0.bin",
         }
     }
 

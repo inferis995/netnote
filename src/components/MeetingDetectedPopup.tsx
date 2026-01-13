@@ -87,7 +87,7 @@ export function MeetingDetectedPopup({
               className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
               style={{
                 backgroundColor: "var(--color-accent)",
-                color: "white",
+                color: "var(--color-accent-text)",
               }}
             >
               Inizia Ascolto

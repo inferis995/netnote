@@ -7,8 +7,14 @@ export function AboutTab() {
       {/* Logo and App Name */}
       <div className="text-center">
         <div className="mb-4">
-          <LogoImage className="w-32 h-auto mx-auto hover:opacity-80 transition-opacity" />
+          <LogoImage className="w-32 h-auto mx-auto hover:scale-105 transition-transform duration-300" />
         </div>
+
+        {/* Styled Wordmark */}
+        <h1 className="text-2xl tracking-tight text-[var(--color-text)] flex items-center justify-center mb-1">
+          <span className="font-light">Net</span><span className="font-bold">Note</span>
+        </h1>
+
         <p
           className="text-sm mt-1"
           style={{ color: "var(--color-text-secondary)" }}

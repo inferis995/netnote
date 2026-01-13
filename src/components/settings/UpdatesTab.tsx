@@ -23,31 +23,14 @@ export function UpdatesTab() {
 
   const recentChanges = [
     {
-      version: "1.0.2",
-      date: "Gennaio 2026",
-      changes: [
-        "Critical Hotfix: Crash Vulkan risolto",
-        "Migliore stabilità audio simultaneo",
-        "Signatures aggiornate"
-      ],
-    },
-    {
-      version: "1.0.1",
-      date: "Gennaio 2026",
-      changes: [
-        "Accelerazione Hardware (Vulkan/Metal)",
-        "Miglioramenti prestazioni trascrizione",
-        "Fix driver GPU su Windows/Mac"
-      ],
-    },
-    {
       version: "1.0.0",
       date: "Gennaio 2026",
       changes: [
         "Prima release ufficiale",
-        "Trascrizione locale con Whisper",
+        "Trascrizione locale con Whisper AI",
         "Profilo e Avatar personalizzabili",
-        "Nuova esperienza utente Premium"
+        "Dashboard 3D interattiva",
+        "Modelli AI Quantizzati per massime prestazioni"
       ],
     }
   ];
@@ -79,7 +62,7 @@ export function UpdatesTab() {
           className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
           style={{
             backgroundColor: "var(--color-accent)",
-            color: "white",
+            color: "var(--color-accent-text)",
           }}
         >
           {checking ? "Controllo..." : "Cerca Aggiornamenti"}
@@ -108,7 +91,7 @@ export function UpdatesTab() {
               className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               style={{
                 backgroundColor: "var(--color-accent)",
-                color: "white",
+                color: "var(--color-accent-text)",
               }}
             >
               {downloading ? "Installazione..." : "Installa Aggiornamento"}

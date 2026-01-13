@@ -136,7 +136,7 @@ export function ProfileTab() {
           className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-40"
           style={{
             backgroundColor: saved ? "#22c55e" : "var(--color-accent)",
-            color: "white",
+            color: saved ? "white" : "var(--color-accent-text)",
           }}
         >
           {saved ? "Salvato!" : "Salva"}

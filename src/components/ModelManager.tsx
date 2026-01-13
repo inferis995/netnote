@@ -165,7 +165,7 @@ function ModelCard({
                   className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
                   style={{
                     backgroundColor: "var(--color-accent)",
-                    color: "white",
+                    color: "var(--color-accent-text)",
                   }}
                 >
                   Load
@@ -190,7 +190,7 @@ function ModelCard({
               className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               style={{
                 backgroundColor: "var(--color-text)",
-                color: "white",
+                color: "var(--color-bg)",
               }}
             >
               {isDownloading ? `${downloadProgress}%` : "Download"}

@@ -416,7 +416,7 @@ export function SystemTab({ onPermissionChange }: SystemTabProps) {
                   className="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
                   style={{
                     backgroundColor: "var(--color-accent)",
-                    color: "white",
+                    color: "var(--color-accent-text)",
                   }}
                 >
                   Richiedi Permesso
@@ -427,7 +427,7 @@ export function SystemTab({ onPermissionChange }: SystemTabProps) {
                   className="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors"
                   style={{
                     backgroundColor: "var(--color-accent)",
-                    color: "white",
+                    color: "var(--color-accent-text)",
                   }}
                 >
                   Apri Impostazioni
@@ -609,7 +609,7 @@ export function SystemTab({ onPermissionChange }: SystemTabProps) {
                     className="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors"
                     style={{
                       backgroundColor: "var(--color-accent)",
-                      color: "white",
+                      color: "var(--color-accent-text)",
                     }}
                   >
                     Apri Impostazioni

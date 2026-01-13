@@ -1121,9 +1121,9 @@ function NoteView({
               <button
                 onClick={onStopRecording}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium"
-                style={{ backgroundColor: "var(--color-accent)", color: "white" }}
+                style={{ backgroundColor: "var(--color-accent)", color: "var(--color-accent-text)" }}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: "var(--color-accent-text)" }} />
                 Stop
               </button>
             </>
@@ -1134,7 +1134,7 @@ function NoteView({
               <button
                 onClick={onResumeRecording}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium"
-                style={{ backgroundColor: "var(--color-accent)", color: "white" }}
+                style={{ backgroundColor: "var(--color-accent)", color: "var(--color-accent-text)" }}
                 title="Resume recording"
               >
                 <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -1163,7 +1163,7 @@ function NoteView({
                 className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full font-medium"
                 style={{
                   backgroundColor: "var(--color-accent)",
-                  color: "white",
+                  color: "var(--color-accent-text)",
                 }}
                 title="Listen"
               >
@@ -1441,7 +1441,7 @@ function ConfirmDialog({
             className="px-4 py-2 text-sm rounded-lg transition-colors"
             style={{
               backgroundColor: "var(--color-accent)",
-              color: "white",
+              color: "var(--color-accent-text)",
             }}
           >
             {confirmLabel}

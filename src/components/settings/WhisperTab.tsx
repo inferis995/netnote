@@ -203,7 +203,7 @@ function WhisperModelCard({
                   className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
                   style={{
                     backgroundColor: "var(--color-accent)",
-                    color: "white",
+                    color: "var(--color-accent-text)",
                   }}
                 >
                   Carica
@@ -227,8 +227,9 @@ function WhisperModelCard({
               disabled={isAnyDownloading}
               className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               style={{
-                backgroundColor: "#374151",
-                color: "white",
+                backgroundColor: "var(--color-bg-elevated)",
+                color: "var(--color-text)",
+                border: "1px solid var(--color-border)"
               }}
             >
               {isDownloading ? `${downloadProgress}%` : "Scarica"}

@@ -130,7 +130,7 @@ export function UpdateNotification({ onOpenSettings }: UpdateNotificationProps) 
               className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
               style={{
                 backgroundColor: "var(--color-accent)",
-                color: "white",
+                color: "var(--color-accent-text)",
               }}
             >
               {downloading ? "Installazione..." : "Installa Ora"}

@@ -1,6 +1,6 @@
-
 import { Note } from "../types";
-import logoImage from "../assets/logo_3d.jpg";
+import { Logo3DCard } from "./Logo3DCard";
+// import logoImage from "../assets/logo_3d.jpg"; // Removed static import
 
 interface DashboardProps {
     onNewNote: () => void;
@@ -26,9 +26,9 @@ export function Dashboard({
                 {/* Header Section */}
                 <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-4">
-                        {/* Brand Logo */}
-                        <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-[var(--color-border)]">
-                            <img src={logoImage} alt="NetNote Logo" className="w-full h-full object-cover" />
+                        {/* 3D Brand Logo */}
+                        <div className="w-14 h-14">
+                            <Logo3DCard />
                         </div>
                         <div>
                             <h1 className="text-2xl tracking-tight text-[var(--color-text)] flex items-center">
@@ -70,7 +70,7 @@ export function Dashboard({
 
                         <div className="relative z-10">
                             <span className="inline-flex items-center justify-center p-3 rounded-xl bg-[var(--color-bg-subtle)] border border-[var(--color-border)] mb-6 group-hover:bg-orange-500 group-hover:border-orange-500 group-hover:text-white transition-all duration-300">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-6 h-6 text-[var(--color-text)] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
                                 </svg>
                             </span>
@@ -119,14 +119,30 @@ export function Dashboard({
                             <div className="w-1.5 h-1.5 rounded-full bg-orange-500" /> Scorciatoie
                         </span>
 
-                        <div className="space-y-3 mt-4">
+                        <div className="space-y-2 mt-4 overflow-y-auto max-h-[220px] pr-2 custom-scrollbar">
                             <div className="flex items-center justify-between text-sm group cursor-help">
                                 <span className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)] transition-colors">Nuova Nota</span>
-                                <kbd className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs font-mono font-bold text-[var(--color-text-secondary)]">CMD + N</kbd>
+                                <kbd className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs font-mono font-bold text-[var(--color-text-secondary)]">Ctrl+N</kbd>
                             </div>
                             <div className="flex items-center justify-between text-sm group cursor-help">
-                                <span className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)] transition-colors">Ricerca</span>
-                                <kbd className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs font-mono font-bold text-[var(--color-text-secondary)]">CMD + K</kbd>
+                                <span className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)] transition-colors">Nuova e Registra</span>
+                                <kbd className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs font-mono font-bold text-[var(--color-text-secondary)]">Ctrl+R</kbd>
+                            </div>
+                            <div className="flex items-center justify-between text-sm group cursor-help">
+                                <span className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)] transition-colors">Stop Registra</span>
+                                <kbd className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs font-mono font-bold text-[var(--color-text-secondary)]">Ctrl+S</kbd>
+                            </div>
+                            <div className="flex items-center justify-between text-sm group cursor-help">
+                                <span className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)] transition-colors">Tema</span>
+                                <kbd className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs font-mono font-bold text-[var(--color-text-secondary)]">Ctrl+M</kbd>
+                            </div>
+                            <div className="flex items-center justify-between text-sm group cursor-help">
+                                <span className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)] transition-colors">Impostazioni</span>
+                                <kbd className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs font-mono font-bold text-[var(--color-text-secondary)]">Ctrl+,</kbd>
+                            </div>
+                            <div className="flex items-center justify-between text-sm group cursor-help">
+                                <span className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)] transition-colors">Chiudi</span>
+                                <kbd className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs font-mono font-bold text-[var(--color-text-secondary)]">Esc</kbd>
                             </div>
                         </div>
                     </div>

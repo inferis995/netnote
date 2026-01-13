@@ -180,7 +180,7 @@ export function NoteEditor({ note, onSave, onClose }: NoteEditorProps) {
               className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               style={{
                 backgroundColor: "var(--color-text)",
-                color: "white",
+                color: "var(--color-bg)",
               }}
             >
               {saving ? "Salvataggio..." : "Salva"}
