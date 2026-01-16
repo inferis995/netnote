@@ -11,6 +11,8 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -43,23 +45,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Build application
-        run: npm run tauri build
-
-      - name: Upload Linux artifact
-        if: matrix.platform == 'ubuntu-22.04'
-        uses: actions/upload-artifact@v4
+      - name: Build application with Tauri Action
+        uses: tauri-apps/tauri-action@v0
         with:
-          name: netnote-linux
-          path: |
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/appimage/*.AppImage
-
-      - name: Upload macOS artifact
-        if: matrix.platform == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: netnote-macos
-          path: |
-            src-tauri/target/release/bundle/dmg/*.dmg
-            src-tauri/target/release/bundle/macos/*.app
+          args: --verbose
