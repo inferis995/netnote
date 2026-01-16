@@ -51,6 +51,10 @@ core-graphics = "0.24"
 core-foundation = "0.10"
 whisper-rs = { version = "0.13", features = ["metal"] }
 
+# Linux-specific dependencies
+[target.'cfg(target_os = "linux")'.dependencies]
+whisper-rs = "0.13"
+
 # Windows-specific dependencies for system audio capture via WASAPI loopback
 [target.'cfg(target_os = "windows")'.dependencies]
 wasapi = "0.16"
