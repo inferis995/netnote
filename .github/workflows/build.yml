@@ -49,3 +49,22 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         with:
           args: --verbose
+
+      - name: Upload Linux artifacts
+        if: matrix.platform == 'ubuntu-22.04'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/rpm/*.rpm
+            src-tauri/target/release/bundle/appimage/*.AppImage
+
+      - name: Upload macOS artifacts
+        if: matrix.platform == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: |
+            src-tauri/target/release/bundle/dmg/*.dmg
+            src-tauri/target/release/bundle/macos/*.app
